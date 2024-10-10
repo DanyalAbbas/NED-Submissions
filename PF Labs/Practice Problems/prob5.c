@@ -8,8 +8,15 @@ int main()
     printf("Enter any number ji : ");
     scanf("%d", &number);
 
-    for (i=1; i<=number; i++)
-        add += i;
+    i = 1;
+    while (i == 1)
+    {
+        add += number%10;
+        number /= 10;
+        
+        if (number < 1)
+            break;
+    }
 
     printf("The added value if %d", add);
 
