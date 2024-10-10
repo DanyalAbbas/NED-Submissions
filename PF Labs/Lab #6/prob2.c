@@ -2,7 +2,7 @@
 
 int main()
 {
-	int a,b, temp, fibonacci, i = 1;
+	int a,b, temp, i = 1;
 	
 	a = 0;
 	b = 1;
@@ -17,8 +17,7 @@ int main()
 				printf("The number %d is not divisible by 3/5/7 >:(\n", a+b);
 			temp = a;
 			a = b;
-			b = temp + a;
-			fibonacci += a;   		  	
+			b = temp + a;	  	
 	   }
 	   else
 	   		i = 0;
