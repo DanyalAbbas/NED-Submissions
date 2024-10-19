@@ -18,7 +18,10 @@ int main()
             matrix_transpose[j][i] = matrix[i][j];
         }
     }
+    
+    printf("The matrix is : ");
     MatrixMaker(matrix);
+    printf("The transpose of the following matrix is : ");
     MatrixMaker(matrix_transpose);
 
     if (TransposeChecker(matrix,matrix_transpose) == 1)
