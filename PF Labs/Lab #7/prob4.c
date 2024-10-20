@@ -24,7 +24,7 @@ int main()
     printf("The transpose of the following matrix is : ");
     MatrixMaker(matrix_transpose);
 
-    if (TransposeChecker(matrix,matrix_transpose) == 1)
+    if (SymmetryChecker(matrix,matrix_transpose) == 1)
         printf("\nThe matrix is symmetric");
     else
         printf("\nThe matrix is not symmetric");
@@ -48,7 +48,7 @@ int MatrixMaker(int matrix[m][n])
     }
 }
 
-int TransposeChecker(int matrix[m][n], int matrix_transpose[m][n])
+int SymmetryChecker(int matrix[m][n], int matrix_transpose[m][n])
 {
     int transpose = 1;
 
