@@ -1,13 +1,31 @@
 #include <stdio.h>
+#include <string.h>
 
 int main()
 {
-    char str[20];
+    char str[20], freq[26] = {0};
+    int i = 0, j = 0, duplicate;
+
 
     printf("Enter any string ji : ");
     gets(str);
     StringHandler(str);
-    printf("%s", str);
+
+    while (str[i] != NULL)
+    {
+        int ch = str[i];
+        freq[ch - 'a']++;
+        i++;
+        
+    }
+
+    for (int i = 0; i < 26; i++)
+    {
+        if (freq[i] > 0)
+            printf("\n%c : %d", i + 'a',freq[i]);
+    }
+    
+
     
 }
 
