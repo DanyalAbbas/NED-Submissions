@@ -16,6 +16,7 @@ int main()
             printf("Enter the (%d,%d) element value of matrix : ", i+1, j+1);
             scanf("%d", &matrix[i][j]);
             matrix_transpose[j][i] = matrix[i][j];
+            
         }
     }
     MatrixMaker(matrix);
