@@ -11,28 +11,28 @@ int main()
     {
         printf("\nYOU GOT 10%% DISCOUNT");
         printf("\nBefore discount : %d", amount_spent);
-        discounted = amount_spent- (amount_spent *0.1);
+        discounted = (float)amount_spent - ((float)amount_spent *0.1);
         printf("\nAfter discount : %d", discounted);
     }
     else if (amount_spent > 1999 && amount_spent < 4001)
     {
         printf("\nYOU GOT 20%% DISCOUNT");
         printf("\nBefore discount : %d", amount_spent);
-        discounted = amount_spent- (amount_spent *0.2);
+        discounted = (float)amount_spent - ((float)amount_spent *0.2);
         printf("\nAfter discount : %d", discounted);
     }
     else if (amount_spent > 4000 && amount_spent < 6001)
     {
         printf("\nYOU GOT 30%% DISCOUNT");
         printf("\nBefore discount : %d", amount_spent);
-        discounted = amount_spent- (amount_spent *0.3);
+        discounted = (float)amount_spent - ((float)amount_spent *0.3);
         printf("\nAfter discount : %d", discounted);
     }
     else if (amount_spent > 6000)
     {
         printf("\nYOU GOT 50%% DISCOUNT");
         printf("\nBefore discount : %d", amount_spent);
-        discounted = amount_spent- (amount_spent *0.5);
+        discounted = (float)amount_spent - ((float)amount_spent *0.5);
         printf("\nAfter discount : %d", discounted);
     }
     else
