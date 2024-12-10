@@ -13,6 +13,7 @@ int main()
         {
             printf("Enter element (%d,%d) of matrix : ", i+1,j+1);
             scanf("%d", &matrix[i][j]);
+            max = matrix[i][j];
             if (matrix[i][j] > max)
             {
                 max = matrix[i][j];
