@@ -4,7 +4,7 @@
 int main()
 {
     char str[50] = "ABC54301 TFTFTFTT TFTFTFFTTFT 11 F";
-    char n[50], s[25], o[25];
+    char n[50], s[25], o[30];
     
     printf("hmm : ");
     gets(n);
@@ -26,5 +26,6 @@ int main()
     o[count] = '\0';
 
     printf("%s\n%s",s,o);
+    printf("\n%d",strlen(o));
 
 }
