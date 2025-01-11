@@ -2,7 +2,7 @@
 
 int main()
 {
-    int alphabet;
+    int alphabet=0;
     printf("Input a alphabet character and me evaluate if it capital or small >:3 : ");
     scanf("%c", &alphabet);
 
@@ -16,6 +16,6 @@ int main()
     }
     else
     {
-        printf("Invalid input");
+        printf("Invalid input : %d", alphabet);
     }
 }
