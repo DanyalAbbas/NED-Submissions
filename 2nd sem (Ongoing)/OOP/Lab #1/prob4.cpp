@@ -6,15 +6,30 @@ int **Multiply(int m1[3][3], int m2[3][3]);
 void MatrixMaker(int **matrix);
 
 int main()
-{   int matrix1[3][3] = {
-            {1, 2, 3},
-            {4, 5, 6},
-            {7, 8, 9}};
+{
+    int matrix1[3][3], matrix2[3][3];
 
-    int matrix2[3][3] = {
-        {9, 8, 7},
-        {6, 5, 4},
-        {3, 2, 1}};
+    // For matrix no: 1
+    cout<<"MATRIX #1"<<endl;
+    for (int i = 0; i < 3; i++)
+    {
+        for (int j = 0; j < 3; j++)
+        {
+            cout<<"Enter the value ("<<i+1<<", "<<j+1<<") : ";
+            cin>>matrix1[i][j];
+        }
+    }
+
+    // For matrix no: 2
+    cout<<"MATRIX #2"<<endl;
+    for (int i = 0; i < 3; i++)
+    {
+        for (int j = 0; j < 3; j++)
+        {
+            cout<<"Enter the value ("<<i+1<<", "<<j+1<<") : ";
+            cin>>matrix2[i][j];
+        }
+    }
     
     int **result = Addition(matrix1, matrix2);
     MatrixMaker(result);
