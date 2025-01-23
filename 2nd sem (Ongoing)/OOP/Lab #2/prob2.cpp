@@ -65,7 +65,7 @@ int main()
     {
         cout<<"What operation do you want to perform? : ";
         cin>>choice;
-        if (choice < 1 && choice > 6)
+        if (choice < 1 || choice > 6)
         {
             cout<<"Invalid Choice"<<endl;
             break;
