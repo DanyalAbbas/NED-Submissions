@@ -18,34 +18,34 @@ class BankAccount
         }
         void deposit(float amount)
         {
-            if (amount > Balance)
+            if (amount > this->Balance)
                 {cout<<"Invalid Input"<<endl;}
             else
-                {Balance += amount;}
+                {this->Balance += amount;}
             NumOfTransactions++;
 
         }
         void withdraw(float amount)
         {
-            if (amount > Balance)
+            if (amount > this->Balance)
                 {cout<<"Invalid Input"<<endl;}
             else
-                {Balance -= amount;}
+                {this->Balance -= amount;}
             NumOfTransactions++;
         }
         int GetNT(void)
         {
-            return NumOfTransactions;
+            return this->NumOfTransactions;
         }
         float CurrentBalance(void)
         {
-            return Balance;
+            return this->Balance;
         }
 
         float CalculateInterest(float TimePeriod)
         {
             InterestEarned += InterestRate*TimePeriod*Balance;
-            Balance += InterestEarned;
+            this->Balance += InterestEarned;
             return InterestEarned;
         }
 
