@@ -46,9 +46,9 @@ int main()
     emp2.setAll("Husn", "Ur Rehman", 68999);
     
 
-    cout<<emp1.getSalary()<<endl;
+    cout<<"Salary before 10% raise : "<<emp1.getSalary()<<endl;
     emp1.GiveRaise(10);
-    cout<<emp1.getSalary()<<endl;
+    cout<<"Salary after 10% raise : "<<emp1.getSalary()<<endl;
 
 
 
