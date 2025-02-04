@@ -28,7 +28,7 @@ class TollBooth
             delete TotalCars;
             delete CashCollected;
         }
-
+        
 };
 
 int main()
