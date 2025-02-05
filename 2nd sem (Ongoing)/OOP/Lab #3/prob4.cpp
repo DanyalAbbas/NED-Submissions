@@ -11,7 +11,7 @@ class bookType
         int price;
         int no_of_copies; 
     public:
-        bookType(string t, string a[], string p, int i, int pr, int n, int no)
+        bookType(string t, string &a, string p, int i, int pr, int n, int no)
         {
             title = t;
             for (int i = 0; i < 4; i++)
@@ -98,47 +98,45 @@ int main()
         switch (choice) {
         case 1:
             if (bookCount < 100) {
-                cin.ignore(); // clear input buffer
                 string title;
                 cout << "Title: ";
-                fflush(stdin);
-                cin>>title;
-                
+                cin.ignore();
+                getline(cin, title);  // Read full title
+
                 int numAuthors;
                 cout << "Number of authors: ";
-                fflush(stdin);
                 cin >> numAuthors;
-                if (numAuthors < 0 || numAuthors > 100) {
-                    cout << "Invalid number of authors. Maximum allowed authors: " << 100 << endl;
-                    break;
-                }
-                string authors[4];
-                fflush(stdin);
-                for (int i = 0; i < 4; i++)
+                cin.ignore();
+
+                string* authors = new string[numAuthors];
+
+                for (int i = 0; i < numAuthors; i++)
                 {
                     cout << "Author " << i + 1 << ": ";
                     getline(cin, authors[i]);
-                    fflush(stdin);
                 }
 
                 string publisher;
                 cout << "Publisher: ";
-                fflush(stdin);
                 getline(cin, publisher);
+
                 int isbn;
                 cout << "ISBN: ";
-                fflush(stdin);
-                cin>>isbn;
+                cin >> isbn;
+
                 int price;
                 cout << "Price: ";
-                fflush(stdin);
                 cin >> price;
+
                 int numCopiesInStock;
                 cout << "Number of copies in stock: ";
-                fflush(stdin);
                 cin >> numCopiesInStock;
 
-                books[bookCount++] = new bookType(title, authors, publisher, isbn, price, numCopiesInStock, numAuthors);
+                books[bookCount++] = new bookType(title, *authors, publisher, isbn, price, numCopiesInStock, numAuthors);
+
+                cout << "Book added successfully!" << endl;
+
+                delete[] authors;
             }
             else {
                 cout << "Maximum number of books reached!" << endl;

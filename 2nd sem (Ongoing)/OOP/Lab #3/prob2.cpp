@@ -44,14 +44,14 @@ int main(void)
 {
     // via default constructor
     EpicClash ob0;
-    cout<<ob0.getH()<<endl<<ob0.getAP()<<endl<<ob0.getD()<<endl<<endl;
+    cout<<"via default constructor -> "<<ob0.getH()<<endl<<ob0.getAP()<<endl<<ob0.getD()<<endl<<endl;
 
     // via parameterized constructor
     EpicClash ob1(200, 69, 420);
-    cout<<ob1.getH()<<endl<<ob1.getAP()<<endl<<ob1.getD()<<endl<<endl;
+    cout<<"via parameterized constructor -> "<<ob1.getH()<<endl<<ob1.getAP()<<endl<<ob1.getD()<<endl<<endl;
 
     // via copy constructor now
     EpicClash ob2(ob1);
-    cout<<ob2.getH()<<endl<<ob2.getAP()<<endl<<ob2.getD()<<endl;
+    cout<<"via copy constructor -> "<<ob2.getH()<<endl<<ob2.getAP()<<endl<<ob2.getD()<<endl;
 
 }
