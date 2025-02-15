@@ -20,7 +20,7 @@ class item
 
 class BakedGoods: public item
 {
-    private:
+    protected:
         float Discount;
     public:
     BakedGoods(string n, int q) : item(n,q), Discount(10) {}
@@ -48,6 +48,7 @@ class Bread: public BakedGoods
         Bread(string n, int q) : BakedGoods(n,q), price(200) {}
 
         float getPrice() {return price;}
+        float getDiscountedPrice() {return price - (price *(Discount/100));}
 };
 
 class Drinks: public item
@@ -69,5 +70,8 @@ int main()
     Drinks ob2("Prime Hydration", 20);
     Cakes ob3("Coffee Cake", 6);
 
+    cout<<"The Discounted price for "<<ob1.getName()<<" is "<<ob1.getDiscountedPrice()<<" Rs After Discount of "<<ob1.getDiscount()<<"%"<<endl;
+    cout<<"The Discounted price for "<<ob2.getName()<<" is "<<ob2.getDiscountedPrice()<<" Rs After Discount of "<<ob2.getDiscount()<<"%"<<endl;
+    cout<<"The Discounted price for "<<ob3.getName()<<" is "<<ob3.getDiscountedPrice()<<" Rs After Discount of "<<ob3.getDiscount()<<"%"<<endl;
 
 }
