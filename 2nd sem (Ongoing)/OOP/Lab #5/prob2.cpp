@@ -90,6 +90,11 @@ class MathsTeacher: public Teacher
 
 int main()
 {
-    Teacher ob1("Danyal Abbas", 20);
-    cout<<ob1.getName()<<endl;
+    MathsTeacher ob1("Danyal Abbas", 20, "NEDUET", "DIC", "Lecturer");
+    cout<<"Name: "<<ob1.getName()<<endl;
+    cout<<"Age: "<<ob1.getAge()<<endl;
+    cout<<"Institute: "<<ob1.getInstitute()<<endl;
+    cout<<"Course Name: "<<ob1.getCourseName()<<endl;
+    cout<<"Designation: "<<ob1.getDesignation()<<endl;
+
 }

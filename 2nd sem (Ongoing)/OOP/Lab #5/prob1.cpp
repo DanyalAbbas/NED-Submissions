@@ -35,7 +35,7 @@ class childclass2: private base
         childclass2(int i, int j, int k) : base(i,j,k) {}
 };
 
-class childclass3: private base
+class childclass3: protected base
 {
     public:
         childclass3(int i, int j, int k) : base(i,j,k) {}
@@ -47,4 +47,8 @@ int main()
     childclass1 ob1(1,2,3);
     childclass2 ob2(4,5,6);
     childclass3 ob3(7,8,9);
+    // cout<<ob1.getPrivate()<<ob1.getProtected()<<ob1.getPublic()<<endl;
+    // cout<<ob2.getPrivate()<<ob2.getProtected()<<ob2.getPublic()<<endl; // 
+    // cout<<ob3.getPrivate()<<ob3.getProtected()<<ob3.getPublic()<<endl; // all inaccessible 
+
 }
