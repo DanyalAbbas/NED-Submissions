@@ -43,12 +43,14 @@ int main()
 {
     Employee emp1, emp2;
     emp1.setAll("Danyal", "Abbas", 10000);
-    emp2.setAll("Husn", "Ur Rehman", 68999);
-    
+    // emp2.setAll("Husn", "Ur Rehman", 68999);
+    emp2 = emp1;
 
+    
+    emp1.setAll("smt", "hmm", 434);
     cout<<"Salary before 10% raise : "<<emp1.getSalary()<<endl;
-    emp1.GiveRaise(10);
-    cout<<"Salary after 10% raise : "<<emp1.getSalary()<<endl;
+    // emp1.GiveRaise(10);
+    cout<<"Salary after 10% raise : "<<emp2.getSalary()<<endl;
 
 
 
