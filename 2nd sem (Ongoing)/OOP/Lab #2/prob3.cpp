@@ -43,6 +43,7 @@ int main()
 {
     Employee emp1, emp2;
     emp1.setAll("Danyal", "Abbas", 10000);
+    // i am about to kms
     // emp2.setAll("Husn", "Ur Rehman", 68999);
     emp2 = emp1;
 
