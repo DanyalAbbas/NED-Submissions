@@ -1,83 +1,48 @@
-//A company has decided to update the salaries of the employees for which updation
-//is required in the payroll system so that employees can be paid according to the
-//revised budget. How can you implement the concept of friend class here? Consider
-//there are 2 classes. One is “Employee” having private data members (name, id,
-//designation, salary etc.) and the other is “Payroll”. The function for updating
-//salaries can be made inside the “Payroll” class that can access the private member
-//“salary” of the “Employee” class and allow the required updation. Implement this scenario.
-
 #include<iostream>
 using namespace std;
+
+class PayRoll{};
 
 class Employee{
 	private:
 	   string name;
 	   int id;
 	   string designation;
-	   float salary;
+	   float salary;   
 	public:
-		
-		Employee(){
-			name=" ";
-			id=0;
-			designation=" ";
-			salary=0.0;
-		}
-		Employee(string n,int i,string d,float s){
+		Employee(string n=" ", int i=0, string d=" ", float s=0.0){
 			name=n;
 	        id=i;
 	        designation=d;
 	        salary=s;
 		}
-		
-		string getname(){
-			return name;
+		void display() const {
+			cout << "Name: " << name << endl;
+			cout << "ID: " << id << endl;
+			cout << "Designation: " << designation << endl;
+			cout << "Salary: $" << salary << endl;
 		}
-		int getid(){
-		    return id;
-		}
-		string getdesignation(){
-			return designation;
-		}
-		float getsalary(){
-			return salary;
-		}
-		void display(){
-			cout<<"ENTER YOUR NAME:"<<endl;
-			cin>>name;
-			cout<<"ENTER YOUR ID:"<<endl;
-			cin>>id;
-			cout<<"ENTER YOUR DESIGNATION:"<<endl;
-			cin>>designation;
-			cout<<"ENTER YOUR SALARY:"<<endl;
-			cin>>salary;
-		}
+		friend class PayRoll;
 };
 
 class PayRoll{
-	private:
-		float updatedsalary;
 	public:
-		PayRoll(float us=0.0){
-			updatedsalary=us;
-		}
-		float getupdatedsalary(){
-			return updatedsalary;
-		}
-		void calculateupdatedsalary(Employee &e,float amount){
-			updatedsalary=e.getsalary()+amount;
-			cout<<"UPDATED SALARY IS:"<<updatedsalary<<endl;
-		}		
+	void updateSalary(Employee& ob, float newSalary) {
+        ob.salary += newSalary;
+        cout << "Salary updated successfully.\n";
+    }	
 };
 
 int main(void){
-    Employee s;
-    s.display();
-    PayRoll p;
-    float amount;
-    cout<<"ENTER YOUR AMOUNT:"<<endl;
-    cin>>amount;
-    p.calculateupdatedsalary(s,amount);
+    Employee ob1("Willy Wonka", 69, "Choclate Factory Manager", 70000);
+	PayRoll p;
+    ob1.display();
+
+    float amount = 90000;
+
+    p.updateSalary(ob1, amount);
+	ob1.display();
+
     return 0;  
 }
 
