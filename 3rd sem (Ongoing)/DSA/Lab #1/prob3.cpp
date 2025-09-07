@@ -26,7 +26,7 @@ class MedianFinder{
 			else
             {
 				int mid=size/2;
-				return(arr[mid-1]+arr[mid])/(double)2;
+				return(arr[mid-1]+arr[mid])/2.0;
 			}
 		}
 };
@@ -39,7 +39,7 @@ int main(void)
     do
     {
     	cin>>num;
-    	mf.addnum(num);
+		if (num!=-1) {mf.addnum(num);}
     } while (num!=-1);
     
 	cout<<"median: " << mf.findmedian()<<endl;
