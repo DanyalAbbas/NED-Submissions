@@ -1,12 +1,12 @@
 #include<iostream>
 using namespace std;
 
-class CalculateMedian{
+class MedianFinder{
 	private:
 		int arr[50000];
 		int size;
 	public:
-		CalculateMedian() : size(0) {}
+		MedianFinder() : size(0) {}
 		
 		void addnum(int num)
         {
@@ -33,7 +33,7 @@ class CalculateMedian{
 
 int main(void)
 {
-	CalculateMedian mf;
+	MedianFinder mf;
 	cout<<"Enter numbers to find median (-1 to stop): "<<endl;
     int num;
     do
@@ -41,7 +41,7 @@ int main(void)
     	cin>>num;
     	mf.addnum(num);
     } while (num!=-1);
-
+    
 	cout<<"median: " << mf.findmedian()<<endl;
 	return 0;
 }
