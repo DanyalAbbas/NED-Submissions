@@ -27,11 +27,11 @@ public:
         Node* newNode = new Node(val);
         if (!front) {
             front = rear = newNode;
-            rear->next = front; // Point to itself
+            rear->next = front; 
         } else {
             rear->next = newNode;
             rear = newNode;
-            rear->next = front; // Maintain circular link
+            rear->next = front; 
         }
         size++;
     }
@@ -41,13 +41,13 @@ public:
             cout << "Queue is empty" << endl;
             return;
         }
-        if (front == rear) { // Only one element
+        if (front == rear) { 
             delete front;
             front = rear = nullptr;
         } else {
             Node* temp = front;
             front = front->next;
-            rear->next = front; // Maintain circular link
+            rear->next = front; 
             delete temp;
         }
         size--;
@@ -73,8 +73,8 @@ int main()
     cq.enqueue(10);
     cq.enqueue(20);
     cq.enqueue(30);
-    cq.display(); // Output: 10 20 30
+    cq.display(); 
     cq.dequeue();
-    cq.display(); // Output: 20 30
+    cq.display(); 
     return 0;
 }

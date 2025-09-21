@@ -58,7 +58,7 @@ public:
             return;
         }
         Node* temp = front;
-        if (front == rear) { // Only one element
+        if (front == rear) { 
             front = rear = nullptr;
         } else {
             front = front->next;
@@ -74,7 +74,7 @@ public:
             return;
         }
         Node* temp = rear;
-        if (front == rear) { // Only one element
+        if (front == rear) { 
             front = rear = nullptr;
         } else {
             rear = rear->prev;
@@ -103,10 +103,10 @@ int main() {
     dq.insertRear(10);
     dq.insertRear(20);
     dq.insertFront(5);
-    dq.display(); // Output: 5 10 20
+    dq.display(); 
     dq.deleteFront();
-    dq.display(); // Output: 10 20
+    dq.display(); 
     dq.deleteRear();
-    dq.display(); // Output: 10
+    dq.display(); 
     return 0;
 }
