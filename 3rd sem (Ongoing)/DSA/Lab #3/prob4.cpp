@@ -42,7 +42,7 @@ public:
             swapped = false;
             Node* current = head;
             while (current->next) {
-                if (current->data > current->next->data) {
+                if (current->data < current->next->data) {
                     swap(current->data, current->next->data);
                     swapped = true;
                 }
