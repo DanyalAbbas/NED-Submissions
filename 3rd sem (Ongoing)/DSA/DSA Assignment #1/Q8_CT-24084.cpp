@@ -24,7 +24,7 @@ void DisplayStuff(Node* head)
     cout<<"nullptr"<<endl;
 }
 
-
+// This time we will Delete a node by its index
 void deleteNodebyIndex(Node*& head, int idx)
 {
     // if head is null or idx is negative we just return
