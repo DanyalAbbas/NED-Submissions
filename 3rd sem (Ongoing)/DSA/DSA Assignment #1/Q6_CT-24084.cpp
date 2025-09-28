@@ -41,11 +41,19 @@ void DisplayStuff(Node* head)
 
 Node* removeNnodes(Node* head, int n)
 {
+    // first we check if head even exist and n is not equal to 0
     while(head && n)
     {
+        // we save the current head value in a temp pointer
+        Node* temp = head;
+        // update the head value to its next
         head = head->next;
+        // then delete the temp freeing the taken address
+        delete temp;
+        // and then decrementing value of n
         n--;
     }
+    // return head after loop is completed
     return head;
 }
 
