@@ -5,7 +5,8 @@ using namespace std;
 // Given an array nums of distinct integers, return all the possible permutations. You can return the answer in any order.
 
 
-void getPerms(vector<int>& nums,int idx, vector<vector<int>>& ans){
+void getPerms(vector<int>& nums,int idx, vector<vector<int>>& ans)
+{
     if(idx == nums.size())
     {
         ans.push_back({nums});
@@ -17,14 +18,14 @@ void getPerms(vector<int>& nums,int idx, vector<vector<int>>& ans){
         getPerms(nums,idx+1,ans);
         swap(nums[idx],nums[i]);
     }
-      }
+}
    
-    vector<vector<int>> permute(vector<int>& nums) 
-    {
-        vector<vector<int>> ans;
-        getPerms(nums,0,ans);
-        return ans;
-    }
+vector<vector<int>> permute(vector<int>& nums) 
+{
+    vector<vector<int>> ans;
+    getPerms(nums,0,ans);
+    return ans;
+}
 
 
 int main()

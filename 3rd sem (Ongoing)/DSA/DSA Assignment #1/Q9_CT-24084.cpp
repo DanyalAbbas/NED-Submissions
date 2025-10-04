@@ -33,9 +33,7 @@ void reverse(Node*& head)
     while(curr) // loops until temp is not NULL
     {
         // in DLL, it is very easy to reverse the LL, we just swap the next and prev pointers of each node
-        Node* temp = curr->prev;
-        curr->prev = curr->next;
-        curr->next = temp;
+        swap(curr->next, curr->prev);
 
         // then we update our prev and curr pointers
         prev = curr;

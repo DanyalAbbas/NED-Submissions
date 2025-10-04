@@ -56,7 +56,7 @@ void RotateKPosition(Node*& head, int k)
     }
 
     // then we just subtract n by k and transfer the head to that position
-    for(int i = 0; i < n-k; i++)
+    for(int i = 0; i < n-(k % n) ; i++)
         head = head->next;
 
 }
