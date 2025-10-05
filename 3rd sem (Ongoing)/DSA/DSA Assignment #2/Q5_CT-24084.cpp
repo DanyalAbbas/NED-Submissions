@@ -28,7 +28,7 @@ int evaluatePostfix(string postfix) {
 
 int main()
 {
-    string p = "5 6 2 + * 1 2 4";
+    string p = "5 6 2 + * 1 3 4 * + /";
     int i = evaluatePostfix(p);
     cout<<i<<endl;
 
