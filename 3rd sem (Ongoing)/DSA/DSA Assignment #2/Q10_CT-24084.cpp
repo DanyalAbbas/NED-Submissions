@@ -36,5 +36,5 @@ int main()
     int k = 2;
     vector<int> ans = maxSlidingWindow(nums, k);
     for (int i : ans)
-        cout<<i<<" ";
+        cout<<i<<" "<<endl;
 }
