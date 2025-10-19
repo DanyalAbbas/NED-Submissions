@@ -54,3 +54,4 @@ int main()
     vector<string> board(n, string(n, '.')); // Initialize an n x n chessboard with '.'
     solveNQueensUtil(board, 0, n); // Start solving from the first row
 }
+
