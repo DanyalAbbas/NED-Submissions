@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Late Delivery Risk Calculator — CT-368 Project</title>
+<meta name="description" content="A live late-delivery risk calculator powered by a gradient-boosting model trained on 50,000 e-commerce orders. CT-368 Fundamentals of Data Science, Danyal Abbas (CT-24084).">
+<style>
+  :root{
+    --ink:#1d1b19;
+    --ink-2:#3c3834;
+    --muted:#6d655e;
+    --line:#eadfd5;
+    --line-strong:#dcc9b9;
+    --paper:#fdfbf9;
+    --card:#ffffff;
+    --accent:#c05621;
+    --accent-dark:#963f13;
+    --accent-soft:#fbeee4;
+    --ok:#2f6d4f;
+    --warn:#b7791f;
+    --bad:#b02a1f;
+    --radius:16px;
+    --shadow:0 1px 2px rgba(29,27,25,.05), 0 12px 32px -18px rgba(29,27,25,.25);
+    --max:1120px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;background:var(--paper);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    font-size:16.5px;line-height:1.6;-webkit-font-smoothing:antialiased;
+  }
+  img{max-width:100%;display:block}
+  a{color:var(--accent-dark);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:var(--max);margin:0 auto;padding:0 24px}
+  .eyebrow{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 12px}
+  h1,h2,h3{line-height:1.2;margin:0;letter-spacing:-.015em}
+  h1{font-size:clamp(2.2rem,4.6vw,3.4rem);font-weight:800}
+  h2{font-size:clamp(1.6rem,2.8vw,2.15rem);font-weight:800}
+  h3{font-size:1.05rem;font-weight:700}
+  p{margin:0 0 14px}
+  .lede{font-size:1.07rem;color:var(--ink-2);max-width:64ch}
+  .muted{color:var(--muted)}
+  .small{font-size:.85rem}
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.9em}
+
+  /* nav */
+  header.nav{position:sticky;top:0;z-index:40;background:rgba(253,251,249,.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  .nav-inner{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:13px 24px;max-width:var(--max);margin:0 auto}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:-.01em;font-size:.95rem;color:var(--ink)}
+  .brand:hover{text-decoration:none}
+  .dot{width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
+  nav ul{display:flex;gap:2px;list-style:none;margin:0;padding:0;flex-wrap:wrap}
+  nav a{display:block;padding:7px 11px;border-radius:999px;font-size:.85rem;color:var(--ink-2);font-weight:600}
+  nav a:hover{background:var(--accent-soft);color:var(--accent-dark);text-decoration:none}
+
+  /* hero */
+  .hero{
+    background:
+      radial-gradient(880px 400px at 85% -10%, #fbe6d6 0%, rgba(251,230,214,0) 62%),
+      radial-gradient(680px 360px at -6% 20%, #f6efe8 0%, rgba(246,239,232,0) 60%),
+      var(--paper);
+    border-bottom:1px solid var(--line);
+  }
+  .hero-inner{padding:56px 24px 44px;display:grid;grid-template-columns:1.3fr .7fr;gap:48px;align-items:end}
+  .hero .kicker{display:inline-flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);color:var(--muted);font-size:.76rem;font-weight:600;padding:6px 12px;border-radius:999px;margin-bottom:18px}
+  .hero p.lede{margin-top:16px}
+  .hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:22px}
+  .btn{display:inline-flex;align-items:center;gap:9px;font-weight:700;font-size:.9rem;padding:11px 19px;border-radius:999px;border:1px solid transparent;transition:.18s ease}
+  .btn:hover{text-decoration:none;transform:translateY(-1px)}
+  .btn-primary{background:var(--accent);color:#fff;box-shadow:0 10px 24px -12px rgba(192,86,33,.7)}
+  .btn-primary:hover{background:var(--accent-dark)}
+  .btn-ghost{background:#fff;border-color:var(--line-strong);color:var(--ink)}
+  .btn-ghost:hover{border-color:var(--accent);color:var(--accent-dark)}
+  .hero-side{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:var(--shadow)}
+  .hero-side .k{font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:800}
+  .hero-side .v{font-size:2.1rem;font-weight:800;letter-spacing:-.03em;line-height:1.15;margin:4px 0 2px}
+  .hero-side .d{font-size:.8rem;color:var(--muted)}
+  .hero-side .split{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px;padding-top:16px;border-top:1px dashed var(--line)}
+  .hero-side .split .v{font-size:1.35rem}
+
+  /* sections */
+  section{padding:64px 0}
+  section[id]{scroll-margin-top:86px}
+  @media (max-width:640px){section[id]{scroll-margin-top:78px}}
+  section + section{border-top:1px solid var(--line)}
+  .section-head{max-width:70ch;margin-bottom:28px}
+  .section-head p{margin-top:12px;color:var(--ink-2)}
+
+  /* ---- tool ---- */
+  #tool{padding-top:48px}
+  .tool-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:26px;align-items:start}
+  .form-card,.result-card{background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow)}
+  .form-card{padding:26px}
+  .form-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:20px}
+  .form-head h2{font-size:1.35rem}
+  .form-head p{margin:4px 0 0;font-size:.84rem;color:var(--muted)}
+  .badge{flex:none;font-size:.7rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;background:#eaf3ee;color:var(--ok);padding:5px 10px;border-radius:999px}
+
+  .fields{display:grid;grid-template-columns:1fr 1fr;gap:16px 18px}
+  .field{display:flex;flex-direction:column;gap:6px}
+  .field.wide{grid-column:1 / -1}
+  .field label{font-size:.8rem;font-weight:700;color:var(--ink-2)}
+  .field .hint{font-weight:500;color:var(--muted);font-size:.75rem}
+  select{
+    font:inherit;font-size:.92rem;color:var(--ink);background:#fff;border:1px solid var(--line-strong);
+    border-radius:10px;padding:9px 12px;appearance:none;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8'><path d='M1 1l5 5 5-5' fill='none' stroke='%236d655e' stroke-width='1.6'/></svg>");
+    background-repeat:no-repeat;background-position:right 12px center;
+  }
+  select:focus-visible,input[type=range]:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .range-row{display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px}
+  input[type=range]{width:100%;accent-color:var(--accent);margin:4px 0}
+  .range-val{font-variant-numeric:tabular-nums;font-size:.82rem;font-weight:700;color:var(--accent-dark);min-width:86px;text-align:right}
+
+  .presets{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px;padding-top:18px;border-top:1px dashed var(--line)}
+  .presets .plabel{width:100%;font-size:.74rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+  .preset{font:inherit;font-size:.8rem;font-weight:700;color:var(--ink-2);background:#fff;border:1px solid var(--line-strong);border-radius:999px;padding:7px 13px;cursor:pointer;transition:.16s ease}
+  .preset:hover{border-color:var(--accent);color:var(--accent-dark);background:var(--accent-soft)}
+
+  .result-card{padding:26px;position:sticky;top:78px}
+  .result-card .rlabel{font-size:.72rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .gauge-wrap{margin:6px auto 0;width:min(260px,100%)}
+  .gauge{width:100%;height:auto;overflow:visible}
+  .gauge .arc-bg{fill:none;stroke:#f1e7de;stroke-width:14;stroke-linecap:round}
+  .gauge .arc-fill{fill:none;stroke:var(--accent);stroke-width:14;stroke-linecap:round;transition:stroke-dasharray .8s cubic-bezier(.2,.7,.2,1),stroke .4s ease}
+  .prob-line{display:flex;align-items:flex-end;justify-content:center;gap:8px;margin-top:-46px}
+  .prob{font-size:3.2rem;font-weight:800;letter-spacing:-.045em;line-height:1;font-variant-numeric:tabular-nums}
+  .prob small{font-size:1.1rem;font-weight:700;letter-spacing:0;color:var(--muted)}
+  .band{display:flex;align-items:center;gap:8px;justify-content:center;margin-top:10px;font-weight:800;font-size:.9rem}
+  .band .swatch{width:10px;height:10px;border-radius:50%}
+  .band-desc{text-align:center;font-size:.82rem;color:var(--muted);margin:6px auto 0;max-width:30ch}
+
+  .drivers{margin-top:22px;padding-top:18px;border-top:1px dashed var(--line)}
+  .drivers h4{margin:0 0 4px;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+  .drivers p.sub{margin:0 0 12px;font-size:.78rem;color:var(--muted)}
+  .driver{display:grid;grid-template-columns:1fr 64px;gap:10px;align-items:center;margin-bottom:10px}
+  .driver .name{font-size:.82rem;color:var(--ink-2)}
+  .driver .val{font-size:.8rem;font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
+  .driver .track{grid-column:1 / -1;height:7px;background:#f4ede7;border-radius:99px;overflow:hidden}
+  .driver .track i{display:block;height:100%;width:0;border-radius:99px;transition:width .6s ease,background .3s ease}
+  .driver.plus .val{color:var(--bad)}
+  .driver.minus .val{color:var(--ok)}
+  .driver.plus .track i{background:#d9856a}
+  .driver.minus .track i{background:#7fae95}
+  .driver-empty{font-size:.82rem;color:var(--muted);margin:0}
+
+  .compare{margin-top:18px;padding-top:16px;border-top:1px dashed var(--line);display:flex;justify-content:space-between;gap:10px;font-size:.78rem;color:var(--muted)}
+  .compare b{display:block;color:var(--ink);font-size:.92rem}
+  .loading{font-size:.85rem;color:var(--muted)}
+
+  /* how it works */
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  .step{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:22px}
+  .step .n{width:28px;height:28px;border-radius:8px;background:var(--accent-soft);color:var(--accent-dark);display:grid;place-items:center;font-weight:800;font-size:.85rem;margin-bottom:12px}
+  .step p{font-size:.88rem;color:var(--muted);margin:6px 0 0}
+  .fineprint{font-size:.8rem;color:var(--muted);margin-top:18px;max-width:80ch}
+
+  /* comparison table */
+  .split-grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:26px;align-items:start}
+  .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  table{width:100%;border-collapse:collapse;font-size:.88rem}
+  .model-table{min-width:480px}
+  caption{caption-side:top;text-align:left;font-size:.78rem;color:var(--muted);padding-bottom:8px}
+  th,td{padding:9px 11px;border-bottom:1px solid var(--line);text-align:left}
+  th{font-size:.7rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:800;border-bottom:1px solid var(--line-strong)}
+  td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+  tr.best td{background:#fdf6f1;font-weight:700}
+  tbody tr:hover{background:#fffdfa}
+  .tag{display:inline-block;font-size:.66rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;padding:2px 7px;border-radius:999px;background:#eaf3ee;color:var(--ok)}
+
+  .metric-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+  .metric{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px}
+  .metric .k{font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:800}
+  .metric .v{font-size:1.5rem;font-weight:800;letter-spacing:-.02em}
+  .metric .d{font-size:.74rem;color:var(--muted)}
+
+  /* findings */
+  .findings{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  .finding{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:22px}
+  .finding .big{font-size:1.6rem;font-weight:800;letter-spacing:-.02em;color:var(--accent-dark)}
+  .finding p{font-size:.84rem;color:var(--muted);margin:6px 0 0}
+  .callout{display:flex;gap:14px;background:var(--accent-soft);border:1px solid #f0d5c1;border-radius:var(--radius);padding:20px 22px;margin-top:22px}
+  .callout .ic{flex:none;width:32px;height:32px;border-radius:9px;background:#fff;border:1px solid #f0d5c1;display:grid;place-items:center;font-weight:800;color:var(--accent)}
+  .callout p{margin:0;font-size:.88rem}
+
+  /* downloads */
+  .dl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  .dl{display:flex;flex-direction:column;justify-content:space-between;gap:16px;background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:22px;transition:.18s ease}
+  .dl:hover{border-color:var(--accent);box-shadow:var(--shadow);text-decoration:none;transform:translateY(-2px)}
+  .dl .kind{font-size:.7rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+  .dl h3{color:var(--ink);margin:6px 0 4px}
+  .dl p{color:var(--muted);font-size:.82rem;margin:0}
+  .dl .go{font-weight:700;color:var(--accent-dark);font-size:.86rem}
+
+  footer{border-top:1px solid var(--line);background:#fff;padding:28px 0}
+  .foot{display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;align-items:center;font-size:.82rem;color:var(--muted)}
+
+  .reveal{opacity:0;transform:translateY(14px)}
+  .reveal.in{opacity:1;transform:none;transition:opacity .6s ease,transform .6s cubic-bezier(.2,.7,.2,1)}
+  @media (prefers-reduced-motion: reduce){.reveal{opacity:1;transform:none}html{scroll-behavior:auto}}
+
+  @media (max-width:980px){
+    .hero-inner{grid-template-columns:1fr;gap:26px;padding:44px 24px 38px}
+    .tool-grid,.split-grid{grid-template-columns:1fr}
+    .result-card{position:static}
+    .steps,.findings,.dl-grid{grid-template-columns:1fr}
+    .split-grid{grid-template-columns:minmax(0,1fr)}
+    section{padding:52px 0}
+  }
+  @media (max-width:480px){
+    .form-head{flex-direction:column;gap:10px}
+    .form-head .badge{align-self:flex-start}
+  }
+  @media (max-width:640px){
+    body{font-size:16px}
+    .nav-inner{padding:11px 16px}
+    .brand-text{display:none}
+    nav a{padding:6px 8px;font-size:.78rem}
+    .fields{grid-template-columns:1fr}
+    .model-table{min-width:0;font-size:.74rem}
+    .model-table th,.model-table td{padding:8px 5px}
+    .model-table td:first-child,.model-table th:first-child{padding-left:10px}
+    .model-table td:last-child,.model-table th:last-child{padding-right:10px}
+    .model-table .tag{display:none}
+    .prob{font-size:2.7rem}
+    .metric-grid{grid-template-columns:1fr 1fr}
+  }
+  @media (max-width:420px){
+    .brand{display:none}
+    .nav-inner{justify-content:center}
+    nav ul{gap:0}
+    nav a{font-size:.72rem;padding:6px 3px}
+  }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="#top"><span class="dot"></span><span class="brand-text">CT-368 · Late Delivery Risk</span></a>
+    <nav aria-label="Sections">
+      <ul>
+        <li><a href="#tool">Try it</a></li>
+        <li><a href="#how">How it works</a></li>
+        <li><a href="#models">Models</a></li>
+        <li><a href="#findings">Findings</a></li>
+        <li><a href="#files">Files</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- HERO -->
+  <section class="hero" style="padding:0">
+    <div class="wrap hero-inner">
+      <div>
+        <span class="kicker">CT-368 Fundamentals of Data Science · Phase 1 &amp; 2 · CT-24084</span>
+        <h1>Will this order arrive late?</h1>
+        <p class="lede">Set the order conditions below and a gradient-boosting model trained on <b>50,000 real order records</b> estimates the risk of missing the promised delivery date — in your browser, in milliseconds.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#tool">Try the calculator</a>
+          <a class="btn btn-ghost" href="assets/CT24084_ProjectReport.pdf">Read the project report</a>
+        </div>
+      </div>
+      <div class="hero-side">
+        <div class="k">Demo model · held-out test</div>
+        <div class="v" id="hero-auc">0.903</div>
+        <div class="d">ROC-AUC on 10,000 unseen orders</div>
+        <div class="split">
+          <div><div class="k">Trees</div><div class="v">150</div></div>
+          <div><div class="k">Training rows</div><div class="v">40k</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TOOL -->
+  <section id="tool">
+    <div class="wrap">
+      <div class="tool-grid">
+
+        <form class="form-card" id="order-form" autocomplete="off">
+          <div class="form-head">
+            <div>
+              <h2>Order conditions</h2>
+              <p>The score updates as you change a field. Every value is a real level from the dataset.</p>
+            </div>
+            <span class="badge" id="model-state">loading</span>
+          </div>
+
+          <div class="fields">
+            <div class="field">
+              <label for="weather_condition">Weather</label>
+              <select id="weather_condition" name="weather_condition"></select>
+            </div>
+
+            <div class="field">
+              <label for="order_priority">Order priority</label>
+              <select id="order_priority" name="order_priority"></select>
+            </div>
+
+            <div class="field">
+              <label for="shipping_method">Shipping method</label>
+              <select id="shipping_method" name="shipping_method"></select>
+            </div>
+
+            <div class="field">
+              <label for="promised_delivery_days">Promised delivery days</label>
+              <div class="range-row">
+                <input type="range" id="promised_delivery_days" name="promised_delivery_days" min="0" max="15" step="1">
+                <output class="range-val" for="promised_delivery_days" data-fmt="days">—</output>
+              </div>
+            </div>
+
+            <div class="field wide">
+              <label for="distance_km">Distance <span class="hint">· road distance from warehouse to customer</span></label>
+              <div class="range-row">
+                <input type="range" id="distance_km" name="distance_km" min="40" max="9554" step="10">
+                <output class="range-val" for="distance_km" data-fmt="km">—</output>
+              </div>
+            </div>
+
+            <div class="field wide">
+              <label for="warehouse_processing_hours">Warehouse processing time</label>
+              <div class="range-row">
+                <input type="range" id="warehouse_processing_hours" name="warehouse_processing_hours" min="1" max="48" step="1">
+                <output class="range-val" for="warehouse_processing_hours" data-fmt="hours">—</output>
+              </div>
+            </div>
+
+            <div class="field wide">
+              <label for="shipping_cost_usd">Shipping cost <span class="hint">· $500 is the dataset’s cap for censored prices</span></label>
+              <div class="range-row">
+                <input type="range" id="shipping_cost_usd" name="shipping_cost_usd" min="4" max="500" step="1">
+                <output class="range-val" for="shipping_cost_usd" data-fmt="usd">—</output>
+              </div>
+            </div>
+          </div>
+
+          <div class="presets" aria-label="Example scenarios">
+            <span class="plabel">Example scenarios</span>
+            <button type="button" class="preset" data-preset="typical">Defaults</button>
+            <button type="button" class="preset" data-preset="snow">Snow · low priority · 6,000 km</button>
+            <button type="button" class="preset" data-preset="clear">Clear · urgent · 400 km</button>
+            <button type="button" class="preset" data-preset="storm">Storm · 6,500 km</button>
+          </div>
+        </form>
+
+        <aside class="result-card" aria-live="polite">
+          <div class="rlabel">Predicted risk of late delivery</div>
+
+          <div class="gauge-wrap">
+            <svg class="gauge" viewBox="0 0 220 120" role="img" aria-labelledby="gauge-title">
+              <title id="gauge-title">Risk gauge</title>
+              <path class="arc-bg" d="M20 110 A90 90 0 0 1 200 110"/>
+              <path class="arc-fill" id="arc" d="M20 110 A90 90 0 0 1 200 110" stroke-dasharray="0 400"/>
+            </svg>
+          </div>
+          <div class="prob-line"><span class="prob" id="prob">—</span><span class="prob" style="font-size:1.2rem"><small>%</small></span></div>
+          <div class="band" id="band"><span class="swatch" style="background:#b7791f"></span><span id="band-text">calculating</span></div>
+          <p class="band-desc" id="band-desc">Loading the model…</p>
+
+          <div class="drivers" id="drivers-block">
+            <h4>What drives this score</h4>
+            <p class="sub">Step by step from the all-default order, so the deltas add up to the total. Fields worth under 0.4 points are hidden.</p>
+            <div id="drivers"><p class="driver-empty">Loading…</p></div>
+          </div>
+
+          <div class="compare">
+            <div>All-default order<b id="base-prob">—</b></div>
+            <div style="text-align:right">Dataset base rate<b>56.3%</b></div>
+          </div>
+        </aside>
+
+      </div>
+
+      <p class="fineprint">The calculator runs a compact gradient-boosting model exported from Python — 150 trees, 0.903 ROC-AUC on the held-out test set, trained on the same cleaned data and split as the project notebook. The report’s final model is a tuned 200-iteration model on 20 inputs and scores 0.898; the small difference is expected. Fields not shown here (order value, weight, country, segment, package size, payment method, carrier) are held at the dataset’s typical value, so the score describes an otherwise typical order with the conditions you set.</p>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section id="how">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="eyebrow">How it works</p>
+        <h2>From order conditions to a probability</h2>
+        <p>The same pipeline as the report, minus the pieces a browser cannot run: median imputation, scaling, one-hot encoding and then the ensemble of trees.</p>
+      </div>
+
+      <div class="steps">
+        <div class="step reveal">
+          <div class="n">1</div>
+          <h3>Encode the order</h3>
+          <p>Numeric fields are standardised with the training set’s means and scales; categorical fields are one-hot encoded. Three engineered features are derived: weather severity, priority rank and distance per promised day.</p>
+        </div>
+        <div class="step reveal">
+          <div class="n">2</div>
+          <h3>150 trees vote</h3>
+          <p>Each small tree splits on thresholds learned from 40,000 orders. The trees are fitted sequentially, each correcting the error left by the ones before it, and their sum is passed through a logistic function.</p>
+        </div>
+        <div class="step reveal">
+          <div class="n">3</div>
+          <h3>Report the risk</h3>
+          <p>The result is a probability between 0 and 1. The band is a reading aid, not a business rule: 0.45 and 0.65 are thresholds for display, chosen around the 56.3% base rate.</p>
+        </div>
+      </div>
+
+      <p class="fineprint"><b>No leakage.</b> In the project every transform is fitted inside the pipeline, per fold, so a validation row never contributes to a median or a category list. The exported demo freezes exactly those training statistics. The test set was used once, at the end.</p>
+    </div>
+  </section>
+
+  <!-- MODELS -->
+  <section id="models">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="eyebrow">The comparison behind the demo</p>
+        <h2>Four models, five folds, one test set</h2>
+        <p>Logistic regression, a decision tree, a random forest and gradient boosting — all in the same pipeline and folds. Gradient boosting won on every metric; tuning moved it by 0.0012, inside the noise.</p>
+      </div>
+
+      <div class="split-grid">
+        <div class="reveal" style="background:#fff;border:1px solid var(--line);border-radius:16px;padding:8px 14px 14px">
+          <div class="table-wrap">
+          <table class="model-table">
+            <caption>Held-out test set · 10,000 orders</caption>
+            <thead>
+              <tr><th>Model</th><th class="num">ROC-AUC</th><th class="num">Acc</th><th class="num">Prec</th><th class="num">Rec</th><th class="num">F1</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Logistic regression</td><td class="num">0.882</td><td class="num">0.791</td><td class="num">0.817</td><td class="num">0.811</td><td class="num">0.814</td></tr>
+              <tr><td>Decision tree</td><td class="num">0.891</td><td class="num">0.798</td><td class="num">0.815</td><td class="num">0.830</td><td class="num">0.822</td></tr>
+              <tr><td>Random forest</td><td class="num">0.889</td><td class="num">0.797</td><td class="num">0.812</td><td class="num">0.832</td><td class="num">0.822</td></tr>
+              <tr class="best"><td>Gradient boosting <span class="tag">best</span></td><td class="num">0.898</td><td class="num">0.805</td><td class="num">0.820</td><td class="num">0.837</td><td class="num">0.828</td></tr>
+            </tbody>
+          </table>
+          </div>
+        </div>
+
+        <div class="reveal">
+          <div class="metric-grid">
+            <div class="metric"><div class="k">Caught late orders</div><div class="v">4,698</div><div class="d">of 5,632 (83.4%)</div></div>
+            <div class="metric"><div class="k">False alarms</div><div class="v">1,028</div><div class="d">upgrades that were not needed</div></div>
+            <div class="metric"><div class="k">Majority baseline</div><div class="v">0.563</div><div class="d">always predict “late”</div></div>
+            <div class="metric"><div class="k">Tuning gain</div><div class="v">+0.001</div><div class="d">below the 0.003 fold noise</div></div>
+          </div>
+          <p class="fineprint" style="margin-top:14px">Why boosting wins: non-linear splits capture the weather × distance interaction, and sequential fitting concentrates later trees on the storm / long-haul cells earlier ones miss. Logistic regression trails because its boundary is linear — its train and CV scores are identical, so it underfits rather than overfits.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINDINGS -->
+  <section id="findings">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="eyebrow">What the data showed</p>
+        <h2>Risk is steep, and it compounds</h2>
+      </div>
+
+      <div class="findings">
+        <div class="finding reveal"><div class="big">93.5% vs 35.0%</div><p>Late rate in snow versus clear weather — a 58-point spread. Storm is 91.0%.</p></div>
+        <div class="finding reveal"><div class="big">81.7% vs 25.7%</div><p>Low-priority versus urgent orders. Urgent orders jump the warehouse queue.</p></div>
+        <div class="finding reveal"><div class="big">100%</div><p>Storm orders beyond 5,000 km were late — 493 of 493. Clear under 1,000 km: 16.7%.</p></div>
+      </div>
+
+      <div class="callout reveal">
+        <div class="ic">!</div>
+        <p><b>Money was not risk.</b> Order value is flat across all quintiles (r = −0.001), so the calculator does not ask for it. Distance, weather and priority carry the signal — the features that are selected by mutual information in the report.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FILES -->
+  <section id="files">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="eyebrow">Deliverables</p>
+        <h2>Everything behind the model</h2>
+        <p>One executed notebook covering both phases, the full report, and the data files in the project folder.</p>
+      </div>
+
+      <div class="dl-grid">
+        <a class="dl reveal" href="assets/CT24084_ProjectReport.pdf">
+          <div><div class="kind">PDF · 18 pages</div><h3>Project report</h3><p>Nine sections, from data understanding to the final evaluation, with all tables and figures.</p></div>
+          <span class="go">Open PDF →</span>
+        </a>
+        <a class="dl reveal" href="assets/CT24084.ipynb">
+          <div><div class="kind">Jupyter · executed</div><h3>Notebook</h3><p>47 cells, 26 of code, 10 figures, 0 errors. Phase 1 in §1–6, Phase 2 in §7–13.</p></div>
+          <span class="go">Download .ipynb →</span>
+        </a>
+        <a class="dl reveal" href="assets/CT24084.html">
+          <div><div class="kind">HTML · rendered</div><h3>Notebook in the browser</h3><p>The executed notebook with every output and chart, no installation needed.</p></div>
+          <span class="go">View HTML →</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <span>Late Delivery Risk Prediction · CT-368 Fundamentals of Data Science</span>
+    <span>Danyal Abbas · CT-24084 · Phase 1 &amp; 2</span>
+  </div>
+</footer>
+
+<script>
+  const WEATHER = {"Clear":0,"Cloudy":1,"Extreme Heat":2,"Rain":3,"Storm":4,"Snow":5};
+  const PRIORITY = {"Urgent":0,"High":1,"Normal":2,"Low":3};
+
+  const FMT = {
+    km: v => Number(v).toLocaleString() + " km",
+    days: v => v + (Number(v) === 1 ? " day" : " days"),
+    hours: v => v + " h",
+    usd: v => "$" + Number(v).toLocaleString()
+  };
+  const fmt = (kind, v) => (FMT[kind] || (x => x))(v);
+
+  let MODEL = null;
+  let DEFAULTS = {};
+  let CURRENT = null;
+  let ARC_LEN = 0;
+
+  const $ = id => document.getElementById(id);
+
+  // ---------- model ----------
+  async function loadModel(){
+    const res = await fetch("assets/model.json");
+    if (!res.ok) throw new Error("model.json missing");
+    MODEL = await res.json();
+
+    // defaults per feature (median / mode)
+    MODEL.columns.forEach(c => {
+      if (!(c.feature in DEFAULTS)) {
+        DEFAULTS[c.feature] = c.type === "num" ? c.median
+                                              : c.mode;
+      }
+    });
+
+    $("hero-auc").textContent = MODEL.metric.roc_auc.toFixed(3);
+    $("model-state").textContent = "model loaded";
+    $("model-state").style.background = "#eaf3ee";
+    $("model-state").style.color = "#2f6d4f";
+
+    buildInputs();
+    applyPreset("typical", false);
+  }
+
+  function buildInputs(){
+    ["weather_condition", "order_priority", "shipping_method"].forEach(name => {
+      const sel = $(name);
+      sel.innerHTML = "";
+      MODEL.ui[name].forEach(v => {
+        const opt = document.createElement("option");
+        opt.value = v; opt.textContent = v;
+        sel.appendChild(opt);
+      });
+      sel.value = DEFAULTS[name];
+      sel.addEventListener("change", () => update());
+    });
+
+    ["distance_km", "promised_delivery_days", "warehouse_processing_hours", "shipping_cost_usd"]
+      .forEach(name => {
+        const el = $(name);
+        el.value = DEFAULTS[name];
+        el.addEventListener("input", () => update());
+      });
+  }
+
+  function readForm(){
+    const v = {};
+    ["weather_condition","order_priority","shipping_method"].forEach(n => v[n] = $(n).value);
+    ["distance_km","promised_delivery_days","warehouse_processing_hours","shipping_cost_usd"]
+      .forEach(n => v[n] = Number($(n).value));
+    return v;
+  }
+
+  function withEngineered(v){
+    const out = {...v};
+    out.weather_severity = WEATHER[v.weather_condition] ?? 0;
+    out.priority_rank = PRIORITY[v.order_priority] ?? 2;
+    out.distance_per_promised_day = v.distance_km / Math.max(1, v.promised_delivery_days);
+    return out;
+  }
+
+  function encode(row){
+    const x = new Float64Array(MODEL.columns.length);
+    for (let i = 0; i < MODEL.columns.length; i++){
+      const c = MODEL.columns[i];
+      x[i] = c.type === "num" ? (row[c.feature] - c.mean) / c.scale
+                              : (row[c.feature] === c.category ? 1 : 0);
+    }
+    return x;
+  }
+
+  function traverse(tree, x){
+    let node = 0;
+    while (tree.left[node] !== -1){
+      node = x[tree.feature[node]] <= tree.threshold[node] ? tree.left[node] : tree.right[node];
+    }
+    return tree.value[node];
+  }
+
+  function score(row){
+    const x = encode(row);
+    let raw = MODEL.baseline;
+    for (let i = 0; i < MODEL.trees.length; i++){
+      raw += MODEL.learning_rate * traverse(MODEL.trees[i], x);
+    }
+    return 1 / (1 + Math.exp(-raw));
+  }
+
+  // ---------- rendering ----------
+  const BANDS = [
+    {max: 0.45, label: "Low risk", color: "#2f6d4f",
+     desc: "Similar orders usually arrive on time."},
+    {max: 0.65, label: "Moderate risk", color: "#b7791f",
+     desc: "Close to the dataset average — worth watching."},
+    {max: 1.01, label: "High risk", color: "#b02a1f",
+     desc: "These conditions miss the promise far more often than not."}
+  ];
+
+  function bandFor(p){ return BANDS.find(b => p < b.max) || BANDS[BANDS.length - 1]; }
+
+  function updateOutputs(){
+    ["distance_km","promised_delivery_days","warehouse_processing_hours","shipping_cost_usd"]
+      .forEach(n => {
+        const out = document.querySelector(`output[for="${n}"]`);
+        if (out) out.textContent = fmt(out.dataset.fmt, $(n).value);
+      });
+  }
+
+  function setGauge(p, color){
+    const arc = $("arc");
+    if (!ARC_LEN){
+      ARC_LEN = arc.getTotalLength();
+      arc.style.strokeDasharray = `0 ${ARC_LEN}`;
+      arc.getBoundingClientRect();
+    }
+    arc.style.stroke = color;
+    arc.style.strokeDasharray = `${(p * ARC_LEN).toFixed(1)} ${ARC_LEN}`;
+  }
+
+  const FIELDS = [
+    ["weather_condition","Weather"],
+    ["order_priority","Priority"],
+    ["shipping_method","Shipping method"],
+    ["distance_km","Distance"],
+    ["promised_delivery_days","Promised days"],
+    ["warehouse_processing_hours","Processing time"],
+    ["shipping_cost_usd","Shipping cost"]
+  ];
+
+  // Step-by-step attribution: start from the all-default order, move the changed
+  // fields one at a time (biggest single-field effect first) and record each jump.
+  // The deltas therefore add up to the total difference from the default order.
+  function drivers(prepared, p0){
+    const base = withEngineered({...DEFAULTS});
+    const changed = FIELDS
+      .filter(([key]) => prepared[key] !== DEFAULTS[key])
+      .map(([key, label]) => {
+        const one = score(withEngineered({...base, [key]: prepared[key]}));
+        return {key, label, effect: Math.abs(one - p0)};
+      })
+      .sort((a, b) => b.effect - a.effect);
+
+    const items = [];
+    let acc = {...base};
+    let prev = p0;
+    changed.forEach(f => {
+      acc = withEngineered({...acc, [f.key]: prepared[f.key]});
+      const p = score(acc);
+      items.push({label: f.label, delta: p - prev});
+      prev = p;
+    });
+    return items.filter(i => Math.abs(i.delta) >= 0.004)
+                .sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta))
+                .slice(0, 4);
+  }
+
+  function renderDrivers(items){
+    const box = $("drivers");
+    if (!items.length){
+      box.innerHTML = '<p class="driver-empty">Every field is at its default value, so there is nothing to attribute. Move a control to see which conditions push the risk.</p>';
+      return;
+    }
+    const maxAbs = Math.max(...items.map(i => Math.abs(i.delta)));
+    box.innerHTML = items.map(it => {
+      const sign = it.delta > 0 ? "plus" : "minus";
+      const width = Math.max(6, (Math.abs(it.delta) / maxAbs) * 100);
+      const pts = (it.delta * 100).toFixed(1);
+      const text = it.delta > 0 ? `+${pts}` : pts;
+      return `<div class="driver ${sign}">
+        <span class="name">${it.label}</span>
+        <span class="val">${text} pts</span>
+        <span class="track"><i style="width:${width}%"></i></span>
+      </div>`;
+    }).join("");
+  }
+
+  function update(){
+    if (!MODEL) return;
+    updateOutputs();
+    const raw = readForm();
+    const prepared = withEngineered({...DEFAULTS, ...raw});
+    const p = score(prepared);
+    const band = bandFor(p);
+    const pDefault = score(withEngineered({...DEFAULTS}));
+
+    CURRENT = p;
+    $("prob").textContent = (p * 100).toFixed(1);
+    setGauge(p, band.color);
+    $("band").querySelector(".swatch").style.background = band.color;
+    $("band-text").textContent = band.label;
+    $("band-text").style.color = band.color;
+    $("band-desc").textContent = band.desc;
+    renderDrivers(drivers(prepared, pDefault));
+  }
+
+  // ---------- presets ----------
+  function applyPreset(name, animate = true){
+    const typical = {...DEFAULTS};
+    const presets = {
+      typical,
+      snow: {...typical, weather_condition:"Snow", order_priority:"Low",
+             distance_km:6000, promised_delivery_days:8,
+             warehouse_processing_hours:24, shipping_cost_usd:300},
+      clear: {...typical, weather_condition:"Clear", order_priority:"Urgent",
+              distance_km:400, promised_delivery_days:2,
+              warehouse_processing_hours:6, shipping_cost_usd:25,
+              shipping_method:"Same Day"},
+      storm: {...typical, weather_condition:"Storm", order_priority:"Normal",
+              distance_km:6500, promised_delivery_days:5,
+              warehouse_processing_hours:30, shipping_cost_usd:420,
+              shipping_method:"International"}
+    };
+    const v = presets[name];
+    if (!v) return;
+
+    ["weather_condition","order_priority","shipping_method"].forEach(n => { $(n).value = v[n]; });
+    ["distance_km","promised_delivery_days","warehouse_processing_hours","shipping_cost_usd"]
+      .forEach(n => { $(n).value = v[n]; });
+
+    update();
+    if (animate) document.querySelector(".result-card").scrollIntoView({behavior:"smooth", block:"center"});
+  }
+
+  document.querySelectorAll(".preset").forEach(btn => {
+    btn.addEventListener("click", () => applyPreset(btn.dataset.preset));
+  });
+
+  // ---------- base rate shown next to the score ----------
+  function showBaseRate(){
+    if (!MODEL) return;
+    $("base-prob").textContent = (score(withEngineered({...DEFAULTS})) * 100).toFixed(1) + "%";
+  }
+
+  loadModel().then(() => {
+    update();
+    showBaseRate();
+    // The tool card grows once real values replace the placeholders, which shifts
+    // every section below it. Re-apply the deep link against the final layout.
+    if (location.hash) {
+      const target = document.querySelector(location.hash);
+      if (target) target.scrollIntoView({block: "start", behavior: "instant"});
+    }
+  }).catch(err => {
+    $("model-state").textContent = "model unavailable";
+    $("band-text").textContent = "Could not load the model";
+    $("band-desc").textContent = "Open the site through a local web server (see README) so assets/model.json can load.";
+    console.error(err);
+  });
+
+  // reveal
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target); }
+    });
+  }, {threshold: .15});
+  document.querySelectorAll(".reveal").forEach(el => io.observe(el));
+</script>
+</body>
+</html>
